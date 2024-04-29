@@ -6,10 +6,11 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Task extends Model
 {
-    use HasFactory;
+    use HasFactory, SoftDeletes;
 
     protected $fillable = [
         'title',
@@ -23,7 +24,7 @@ class Task extends Model
 
     public function assigneeUser(): BelongsTo
     {
-        return $this->belongsTo(User::class, 'assignee');
+        return $this->belongsTo(User::class, 'assignee', 'id');
     }
 
     public function createdByUser(): BelongsTo
