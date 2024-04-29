@@ -65,5 +65,6 @@ class Kernel extends HttpKernel
         'throttle' => \Illuminate\Routing\Middleware\ThrottleRequests::class,
         'verified' => \Illuminate\Auth\Middleware\EnsureEmailIsVerified::class,
         'rate.limit.create.api' => \App\Http\Middleware\RateLimitForCreateApiMiddleware::class,
+        'rate.limit.per.day' => \App\Http\Middleware\RateLimitForAccessApi::class,
     ];
 }
