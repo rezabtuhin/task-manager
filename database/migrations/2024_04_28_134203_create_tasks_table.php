@@ -13,10 +13,9 @@ return new class extends Migration
     {
         Schema::create('tasks', function (Blueprint $table) {
             $table->id();
-            $table->id();
             $table->string('title');
             $table->text('description')->nullable();
-            $table->integer('priority')->default(0);
+            $table->enum('priority', ['Low', 'Medium', 'High']);
             $table->unsignedBigInteger('assignee')->nullable();
             $table->enum('status', ['New', 'In Progress', 'Testing', 'Deployed'])->default('New');
             $table->unsignedBigInteger('created_by')->nullable();
