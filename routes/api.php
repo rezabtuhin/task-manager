@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\Api\CreateTaskController;
+use App\Http\Controllers\Api\TaskDetailsController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -14,12 +16,9 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-<<<<<<< Updated upstream
-Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
-    return $request->user();
-=======
+Route::group(['middleware' => 'rate.limit.per.day'], function (){
+    Route::middleware('rate.limit.create.api')->post('/create-task', [CreateTaskController::class, 'store']);
     Route::get('/task/{task_id}', [TaskDetailsController::class, 'index']);
     Route::put('/task/{task_id}', [TaskDetailsController::class, 'update']);
     Route::delete('/task/delete/{task_id}', [TaskDetailsController::class, 'delete']);
->>>>>>> Stashed changes
 });

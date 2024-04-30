@@ -1,5 +1,9 @@
 <?php
 
+use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Pages\HomeController;
+use App\Http\Controllers\Pages\TaskController;
+use App\Http\Controllers\Pages\TaskListController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -13,12 +17,10 @@ use Illuminate\Support\Facades\Route;
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
+Route::middleware(['guest'])->group(function () {
+    Route::get('/', [LoginController::class, 'index'])->name('login');
+    Route::post('/', [LoginController::class, 'login'])->name('login');
 });
-<<<<<<< Updated upstream
-=======
-
 
 Route::group(['middleware' => ['auth']], function (){
     Route::get('/home', [HomeController::class, 'index'])->name('home');
@@ -27,5 +29,3 @@ Route::group(['middleware' => ['auth']], function (){
     Route::get('/task/{task_id}/edit', [TaskController::class, 'edit']);
     Route::post('/logout', [LoginController::class, 'destroy'])->name('logout');
 });
-
->>>>>>> Stashed changes
