@@ -26,7 +26,10 @@
                 </div>
             </div>
         </div>
-        <div>
+        <div class="space-x-2">
+            <a href="/task/{{ $cachedTask->id }}/edit" class="bg-blue-500 hover:bg-blue-400 text-white font-bold py-2 px-4 hover:border-blue-500 rounded text-[19px]">
+                Edit Task
+            </a>
             <button id="deleteTaskBtn" data-task-id="{{ $cachedTask->id }}" class="bg-red-500 hover:bg-red-400 text-white font-bold py-2 px-4 hover:border-blue-500 rounded">
                 Delete Task
             </button>
