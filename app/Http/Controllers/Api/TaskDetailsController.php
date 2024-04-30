@@ -11,6 +11,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Redis;
+use Illuminate\Validation\Rule;
 
 class TaskDetailsController extends Controller
 {
@@ -61,5 +62,44 @@ class TaskDetailsController extends Controller
         } catch (ModelNotFoundException $exception) {
             return response()->json(['error' => 'Task not found'], 404);
         }
+    }
+
+    public function update(Request $request, Task $task_id)
+    {
+        $validatedData = $request->validate([
+            'token' => 'required|string',
+            '_token' => 'nullable',
+            'status' => [
+                'required',
+                Rule::in(['New', 'In Progress', 'Testing', 'Deployed'])
+            ]
+        ]);
+        $additionalVariables = array_diff(array_keys($request->all()), array_keys($validatedData));
+        if (!empty($additionalVariables)) {
+            return response()->json(['message' => 'Invalid request data.'], 400);
+        }
+
+        $tokenExists = Token::where('token', $request->token)->exists();
+        if ($tokenExists) {
+            if ($task_id->status == $request->status){
+                return response()->json(['message' => 'Task is already in the '.$request->status.' state.'], 401);
+            }
+            $statusChanged = $task_id->changeStatus($request->status);
+
+            if ($statusChanged === true) {
+                $currentTask = json_decode(Redis::get('task:' . $task_id->id));
+                $currentTask->status = $request->status;
+                Redis::set('task:'.$task_id->id, json_encode($currentTask));
+                return response()->json(['message' => 'Status updated successfully'], 200);
+            } elseif ($statusChanged === false) {
+                return response()->json(['message' => 'Unable to update status'], 400);
+            } elseif ($statusChanged === 'already_deployed') {
+                return response()->json(['message' => 'Task is already in the Deployed state'], 401);
+            } elseif (str_starts_with($statusChanged, 'not_allowed')) {
+                $remainingMinutes = explode(':', $statusChanged)[1];
+                return response()->json(['message' => "Can't change status within ". 15 - $remainingMinutes ." minutes of previous update"], 401);
+            }
+        }
+        return response()->json(['message' => 'Invalid token'], 401);
     }
 }
