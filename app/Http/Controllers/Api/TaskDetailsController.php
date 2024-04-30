@@ -75,12 +75,18 @@ class TaskDetailsController extends Controller
             ]
         ]);
         $additionalVariables = array_diff(array_keys($request->all()), array_keys($validatedData));
+        $token = Token::where('token', $request->token)->first();
         if (!empty($additionalVariables)) {
+            TaskLog::create([
+                'task_id' => $task_id->id,
+                'user_id' => $token ? $token->user_id : 0,
+                'event_type' => 'Attempted to edit task with invalid request data.',
+                'ip_address' => request()->ip(),
+                'user_agent' => request()->userAgent()
+            ]);
             return response()->json(['message' => 'Invalid request data.'], 400);
         }
-
-        $tokenExists = Token::where('token', $request->token)->exists();
-        if ($tokenExists) {
+        if ($token) {
             if ($task_id->status == $request->status){
                 return response()->json(['message' => 'Task is already in the '.$request->status.' state.'], 401);
             }
@@ -90,12 +96,40 @@ class TaskDetailsController extends Controller
                 $currentTask = json_decode(Redis::get('task:' . $task_id->id));
                 $currentTask->status = $request->status;
                 Redis::set('task:'.$task_id->id, json_encode($currentTask));
+                TaskLog::create([
+                    'task_id' => $task_id->id,
+                    'user_id' => $token->user_id,
+                    'event_type' => 'Updated task.',
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ]);
                 return response()->json(['message' => 'Status updated successfully'], 200);
             } elseif ($statusChanged === false) {
+                TaskLog::create([
+                    'task_id' => $task_id->id,
+                    'user_id' => $token->user_id,
+                    'event_type' => 'Attempted to update task with wrong information.',
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ]);
                 return response()->json(['message' => 'Unable to update status'], 400);
             } elseif ($statusChanged === 'already_deployed') {
+                TaskLog::create([
+                    'task_id' => $task_id->id,
+                    'user_id' => $token->user_id,
+                    'event_type' => 'Attempted to update task from deployed state.',
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ]);
                 return response()->json(['message' => 'Task is already in the Deployed state'], 401);
             } elseif (str_starts_with($statusChanged, 'not_allowed')) {
+                TaskLog::create([
+                    'task_id' => $task_id->id,
+                    'user_id' => $token->user_id,
+                    'event_type' => 'Attempted to update task within 15 minutes of previous update.',
+                    'ip_address' => request()->ip(),
+                    'user_agent' => request()->userAgent()
+                ]);
                 $remainingMinutes = explode(':', $statusChanged)[1];
                 return response()->json(['message' => "Can't change status within ". 15 - $remainingMinutes ." minutes of previous update"], 401);
             }
