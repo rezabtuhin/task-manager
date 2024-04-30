@@ -41,4 +41,16 @@ class TaskController extends Controller
             return view('pages.task-view', compact('cachedTask'));
         }
     }
+
+    public function edit($task_id)
+    {
+        if (Redis::exists("task:".$task_id)){
+            $cachedTask = json_decode(Redis::get("task:".$task_id));
+//            dd($cachedTask);
+        }
+        else{
+            $cachedTask = Task::find($task_id);
+        }
+        return view('pages.task-edit', compact('cachedTask'));
+    }
 }
