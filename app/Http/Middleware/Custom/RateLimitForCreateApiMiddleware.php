@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Middleware;
+namespace App\Http\Middleware\Custom;
 
 use Closure;
+use Illuminate\Cache\RateLimiter;
 use Illuminate\Http\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Illuminate\Cache\RateLimiter;
+
 class RateLimitForCreateApiMiddleware
 {
     protected $limiter;
