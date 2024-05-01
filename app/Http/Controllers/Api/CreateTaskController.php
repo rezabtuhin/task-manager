@@ -27,7 +27,7 @@ class CreateTaskController extends Controller
             'description' => 'required',
             'priority' => 'required|in:Low,Medium,High',
             'assignee' => 'required|exists:tokens,token',
-            'images.*' => 'required|image|mimes:jpeg,png,jpg',
+            'images.*' => 'required',
             'token' => 'required|exists:tokens,token'
         ];
         $validator = Validator::make($data, $rules);

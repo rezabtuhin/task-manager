@@ -21,9 +21,36 @@
                 <h1 class="text-[20px] font-black">Images</h1>
                 <div class="flex space-x-2">
                     @foreach($cachedTask->images as $image)
-                        <img src="{{ asset($image) }}" alt="" srcset="" width="100">
+                        @if (strpos($image, '.') !== false)
+                            @php
+                                $extension = pathinfo($image, PATHINFO_EXTENSION);
+                            @endphp
+                            @if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp']))
+                                <img src="{{ asset($image) }}" alt="" srcset="" width="100">
+                            @endif
+                        @endif
                     @endforeach
                 </div>
+            </div>
+            <div>
+                <h1 class="text-[20px] font-black">Files</h1>
+                <ol class="list-decimal">
+                @foreach($cachedTask->images as $image)
+                    @php
+                        $fileName = basename($image);
+                    @endphp
+                    @if (strpos($image, '.') !== false)
+                        @php
+                            $extension = pathinfo($image, PATHINFO_EXTENSION);
+                        @endphp
+                        @if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp']))
+                            <li><a class="text-blue-700 hover:underline" href="{{ asset($image) }}" download>{{ $fileName }}</a></li>
+                        @endif
+                    @else
+                        <li><a class="text-blue-700 hover:underline" href="{{ asset($image) }}" download>{{ $fileName }}</a></li>
+                    @endif
+                @endforeach
+                </ol>
             </div>
         </div>
         <div class="space-x-2">
