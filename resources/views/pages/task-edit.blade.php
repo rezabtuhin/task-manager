@@ -53,14 +53,61 @@
                             @endif
                         </div>
                     </div>
-
                     <div class="col-span-full">
                         <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Images</label>
                         <div class="flex space-x-2">
+                            @php
+                                $imageFound = false;
+                            @endphp
                             @foreach($cachedTask->images as $image)
-                                <img src="{{ asset($image) }}" alt="" srcset="" width="100">
+                                @if (strpos($image, '.') !== false)
+                                    @php
+                                        $extension = pathinfo($image, PATHINFO_EXTENSION);
+                                    @endphp
+                                    @if (in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp']))
+                                        @php
+                                            $imageFound = true;
+                                        @endphp
+                                        <img src="{{ asset($image) }}" alt="" srcset="" width="100">
+                                    @endif
+                                @endif
                             @endforeach
+                            @if (!$imageFound)
+                                <p class="text-sm">No images provided</p>
+                            @endif
                         </div>
+                    </div>
+                    <div>
+                        <label for="cover-photo" class="block text-sm font-medium leading-6 text-gray-900">Files</label>
+                        <ol class="list-decimal text-sm">
+                            @php
+                                $fileFound = false;
+                            @endphp
+                            @foreach($cachedTask->images as $image)
+                                @php
+                                    $fileName = basename($image);
+                                @endphp
+                                @if (strpos($image, '.') !== false)
+                                    @php
+                                        $extension = pathinfo($image, PATHINFO_EXTENSION);
+                                    @endphp
+                                    @if (!in_array($extension, ['jpg', 'jpeg', 'png', 'gif', 'bmp']))
+                                        @php
+                                            $fileFound = true;
+                                        @endphp
+                                        <li><a class="text-blue-700 hover:underline" href="{{ asset($image) }}" download>{{ $fileName }}</a></li>
+                                    @endif
+                                @else
+                                    @php
+                                        $fileFound = true;
+                                    @endphp
+                                    <li><a class="text-blue-700 hover:underline" href="{{ asset($image) }}" download>{{ $fileName }}</a></li>
+                                @endif
+                            @endforeach
+                            @if (!$fileFound)
+                                <p class="text-sm">No files provided</p>
+                            @endif
+                        </ol>
                     </div>
                 </div>
             </div>
@@ -97,6 +144,11 @@
                             didOpen: (toast) => {
                                 toast.onmouseenter = Swal.stopTimer;
                                 toast.onmouseleave = Swal.resumeTimer;
+                            },
+                            didClose: () => {
+                                if (response.status === 'Deployed') {
+                                    location.reload();
+                                }
                             }
                         });
                         Toast.fire({
@@ -106,7 +158,6 @@
                     },
                     error: function(xhr, status, error) {
                         const response = JSON.parse(xhr.responseText);
-                        console.log(response)
                         const Toast = Swal.mixin({
                             toast: true,
                             position: "top-end",
@@ -122,6 +173,7 @@
                             icon: "error",
                             title: response.message
                         });
+                        $('#task-update').trigger('reset');
                     }
                 })
             })

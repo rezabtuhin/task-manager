@@ -103,7 +103,7 @@ class TaskDetailsController extends Controller
                     'ip_address' => request()->ip(),
                     'user_agent' => request()->userAgent()
                 ]);
-                return response()->json(['message' => 'Status updated successfully'], 200);
+                return response()->json(['message' => 'Status updated successfully', 'status' => $request->status], 200);
             } elseif ($statusChanged === false) {
                 TaskLog::create([
                     'task_id' => $task_id->id,
