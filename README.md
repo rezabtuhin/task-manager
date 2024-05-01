@@ -1,66 +1,189 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Task Manager
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+Task Manager is a web application designed to manage tasks assigned to different users with task priority and email confirmation.
 
-## About Laravel
+# Features
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+1. **Basic Authentication**:
+   - Basic Auth for Web & APIs are implemented, API call needs those token to access the resources.
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+2. **Task Management**:
+   - Users can create tasks and assign to different users even to themselves.
+   - Each tasks contain `title`, `description`, `priority`, `assignee`, `image` (Multiple), and `status`.
+   - Status Options: `New`, `In Progress`, `Testing`, `Deployed`.
+   - Once a ticket is created, the initial status is set to New and can be immediately changed to the next status by editing the task.
+   - Once a task moves to a status other than `New`, users can't change the status for 15 minutes.
+   - Once the status is `Deployed` state, users can no longer change the status.
+   - Delete operation uses Soft Delete.
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+3. **Caching**:
+   - Page content or Task model is cached to reduce DB calls using Redis.
 
-## Learning Laravel
+4. **Email Notification**:
+   - Users receive an email when a task is assigned to them. The email sending mechanism is implemented separately to update the task creator instantly without waiting for response.
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+5. **Logging**:
+   - User information of who/when created/updated/deleted a task via web/api is logged, including their IP address and user-agent record.
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+# Additional Features
+- API makes use of REST API Standards.
+- A single token can be used to make a maximum of 200 API calls in 24 hours.
+- Create API does not accept more than 3 concurrent requests within 5 minutes from the same user/token.
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- Status Change API behaves like the web, allowing immediate changes only when the status is New.
+- For any other status, changes are not allowed within 15 minutes, and once the status is Deployed, no further changes are allowed.
 
-## Laravel Sponsors
+# Technologies Used
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+- PHP
+- Laravel
+- MySQL
+- TailwindCSS
+- Redis
+- Mailtrap
+- jQuery
+- Nodejs
+- Composer
 
-### Premium Partners
+# Project Directory Structure
+1. **/app:** Core code including models, controllers, middleware.
+2. **/config:** Configuration files (database, caching).
+3. **/database:** Migration, seed, factory files.
+4. **/public:** Entry point (`index.php`), assets.
+5. **/resources:** Views, language files, frontend assets.
+6. **/routes:** URL-to-action mappings (Both web & api).
+7. **/storage:** Generated files (logs, cached views, uploads).
+8. **/vendor:** Composer dependencies.
+9. **.env:** Environment-specific settings.
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+# MVC Architecture Overview
+The architecture of this project follows the Model-View-Controller (MVC) pattern, which helps organize code into logical components for better maintainability and scalability.
 
-## Contributing
+**Controllers**
+ - **API Controllers:** Responsible for providing resources via API calls.
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+- **Auth Controllers:** Handle user authentication.
 
-## Code of Conduct
+- **Pages Controllers:** Serve basic resource pages.
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+**Models**
+- Models interact with the database and encapsulate business logic.
 
-## Security Vulnerabilities
+**Views**
+- **Components Views:** Provide universal layouts for all pages.
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- **Auth Views:** Render pages for authentication.
 
-## License
+- **Email Views:** Contain email templates.
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+- **Pages Views:** Render basic pages.
+
+This architecture separates concerns and promotes code organization, making it easier to maintain and extend the application.
+
+**Dependencies are manages by composer `(php)` and npm `(Javascript)`**
+
+# Database Schema Overview
+
+The database schema consists of the following tables:
+
+1. **users:**  Stores user information. Each user can have multiple tokens.
+
+2. **tokens:** Stores authentication tokens, each linked to a user.
+
+3. **tasks:**
+   - Stores task details like title, description, priority, and status.
+   - Includes relationships with the users table for assignee, created_by, and updated_by fields.
+
+4. **task_logs:** Records task-related events, including task ID, user ID, event type, IP address, and user agent.
+
+5. **task_images:** Stores paths to images associated with tasks, linked via task ID.
+
+
+# Server Requirements
+- PHP 8.1 or higher.
+- Mysql 8 or higher.
+- Composer 2.7.4 or higher.
+- Node 20.12.2 or higher.
+- npm 10.5.0 or higher.
+- Redis 7.0.15 or higher.
+- Apache or Nginx.
+- PHP extension like (`pdo-mysql`, `ext-xml`, `gzip`, `php-mysql`).
+
+# Set-up Development Environment Locally
+
+Your machine must have installed `PHP`, `Composer`, `MySQL`, `git`, `node`, `npm`, `Redis`, `Apache or Nginx`, and Required php extension mentioned above in the `Server Requirements` section.
+
+```sh
+git clone https://github.com/rezabtuhin/task-manager.git
+cd task-manager
+```
+```sh
+composer install
+```
+
+```sh
+npm install
+```
+```sh
+npm run build
+```
+
+```sh
+cp .env.example .env
+```
+
+Set up the database in the `.env` file and your `MySQL` server and other configurations.
+
+**Setup the database**
+```sh
+DB_CONNECTION=mysql
+DB_HOST={{ YOUR HOST }}
+DB_PORT={{ YOUR PORT }}
+DB_DATABASE={{ YOUR DATABASE NAME }}
+DB_USERNAME={{ YOUR DATABASE USERNAME }}
+DB_PASSWORD={{ YOUR DATABASE PASSWORD }}
+```
+**Setup the Mail configuration (We suggest you to use Mailtrap for development purpose)**
+```sh
+MAIL_MAILER=smtp
+MAIL_HOST={{ YOUR MAIL HOST }}
+MAIL_PORT={{ YOUR MAIL PORT }}
+MAIL_USERNAME={{ YOUR MAIL USERNAME }}
+MAIL_PASSWORD={{ YOUR MAIL PASSWORD }}
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS="{{ YOUR MAIL FROM ADDRESS }}"
+MAIL_FROM_NAME="{{ YOUR MAIL FROM NAME }}"
+```
+
+**Setup the Redis**
+
+```sh
+REDIS_HOST={{ YOUR REDIS HOST }}
+REDIS_PASSWORD={{ YOUR REDIS PASSWORD }}
+REDIS_PORT={{ YOUR REDIS PORT }}
+```
+
+**Generate Secret Key**
+```sh
+php artisan key:generate
+```
+
+**Database Migration**
+```sh
+php artisan migrate
+```
+
+**Now you have to run these three command in three separate shell at a time**
+
+```sh
+npm run dev
+```
+```sh
+php artisan serve
+```
+
+```sh
+php artisan queue:work
+```
+
+**Now you can access the application.**
