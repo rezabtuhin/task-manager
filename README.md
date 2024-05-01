@@ -143,6 +143,8 @@ DB_DATABASE={{ YOUR DATABASE NAME }}
 DB_USERNAME={{ YOUR DATABASE USERNAME }}
 DB_PASSWORD={{ YOUR DATABASE PASSWORD }}
 ```
+**Now Create a database in your mysql server as per the `DB_DATABASE`.**
+
 **Setup the Mail configuration (We suggest you to use Mailtrap for development purpose)**
 ```sh
 MAIL_MAILER=smtp
@@ -170,8 +172,10 @@ php artisan key:generate
 
 **Database Migration**
 ```sh
-php artisan migrate
+php artisan migrate:fresh --seed
 ```
+After this migration command some data will be stored in the users table. Which includes the User email and password.
+you can login with the any of those emails and the initial password is `password`.
 
 **Now you have to run these three command in three separate shell at a time**
 
